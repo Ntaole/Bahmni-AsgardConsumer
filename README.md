@@ -14,7 +14,7 @@ The system can currently synchronize Bahmni ERM and Odoo patients and drugs.Proo
 
 ### 2. **Run Your Appended docker-compose.yml**
 
-1. Execute `docker compose up`.
+1. Execute `docker compose up` for your Bahmni Configuration.
 
 ### 3. **Enable Binlog on OpenMRS**
 
