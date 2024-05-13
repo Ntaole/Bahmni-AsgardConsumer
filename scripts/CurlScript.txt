@@ -1,0 +1,23 @@
+curl -i -X PUT -H "Content-Type:application/json" \
+  http://localhost:8083/connectors/source-debezium-orders-00/config \
+  -d '{
+            "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+            "database.hostname": "openmrsdb",
+            "database.port": "3306",
+            "database.user": "debezium",
+            "database.password": "dbz",
+            "database.server.id": "223344",
+            "database.server.name": "asgard",
+            "table.whitelist": "openmrs.event_records,openmrs.visit,openmrs.users,openmrs.person_attribute,openmrs.privilege,openmrs.person_name,openmrs.person,openmrs.person_address,openmrs.patient_program,openmrs.patient_identifier_type,openmrs.patient_identifier,openmrs.patient, openmrs.orders,openmrs.event_records,openmrs.event_records",
+            "database.history.kafka.bootstrap.servers": "broker:9092",
+            "database.history.kafka.topic": "dbhistory.demo" ,
+            "decimal.handling.mode": "double",
+            "include.schema.changes": "true",
+            "transforms": "unwrap",
+            "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+	    "key.converter.schemas.enable": "false",
+	    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+   	    "value.converter.schemas.enable": "false"
+    }'
+
+
