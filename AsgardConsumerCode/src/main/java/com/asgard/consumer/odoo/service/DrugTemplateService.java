@@ -17,6 +17,9 @@ public class DrugTemplateService {
        public List<DrugTemplate> findByuuid(String string) {
         return drugTemplateRepo.findByuuid(string);
     } 
+    public List<DrugTemplate> findByid(Integer string) {
+        return drugTemplateRepo.findByid(string);
+    } 
 
     public DrugTemplate insertInto(DrugTemplate drugTemplate) {
         return drugTemplateRepo.save(drugTemplate);

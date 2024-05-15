@@ -24,7 +24,7 @@ public class kafkaconfigs {
     @Bean
 	public ConsumerFactory<String, String> consumerFactory() {
 		Map<String, Object> configs = new HashMap<>();
-		configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKABOOTSTRAPERVER);
+		configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
 		configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		configs.put(ConsumerConfig.GROUP_ID_CONFIG, "consumergroup");
@@ -43,7 +43,7 @@ public class kafkaconfigs {
 	@Bean
 	public ConsumerFactory<String, User> userConsumerFactory() {
 		Map<String, Object> configs = new HashMap<>();
-		configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,KAFKABOOTSTRAPERVER);
+		configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"localhost:29092");
 		configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
 		configs.put(ConsumerConfig.GROUP_ID_CONFIG, "odin23");

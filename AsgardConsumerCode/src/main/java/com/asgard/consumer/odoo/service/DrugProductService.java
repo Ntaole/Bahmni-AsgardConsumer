@@ -1,5 +1,7 @@
 package com.asgard.consumer.odoo.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.asgard.consumer.odoo.model.DrugProduct;
@@ -16,6 +18,9 @@ public class DrugProductService {
 
         public DrugProduct insertInto(DrugProduct drugProduct) {
         return drugProductRepo.save(drugProduct);
+    } 
+        public List<DrugProduct> findByuuid(String string) {
+        return drugProductRepo.find(string);
     } 
 
 }

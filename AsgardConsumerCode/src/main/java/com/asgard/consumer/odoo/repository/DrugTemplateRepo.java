@@ -16,5 +16,7 @@ public interface DrugTemplateRepo extends JpaRepository<DrugTemplate,Integer>{
     @Query("SELECT rp FROM DrugTemplate rp WHERE rp.uuid = :value")
     List<DrugTemplate> findByuuid(@Param("value") String value);
 
-    
+    @Query("SELECT rp FROM DrugTemplate rp WHERE rp.id = :value")
+    List<DrugTemplate> findByid(@Param("value") Integer value);
+
 }

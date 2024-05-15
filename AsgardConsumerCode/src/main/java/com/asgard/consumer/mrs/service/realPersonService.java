@@ -26,4 +26,10 @@ public class realPersonService {
     }
 
 
+
+    public List<Person> findbyid(Integer id){
+        return mrsRepo.findByid(id);
+    }
+
+
 }

@@ -6,20 +6,32 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.asgard.consumer.mrs.model.Concept;
 import com.asgard.consumer.mrs.model.Drug;
+import com.asgard.consumer.mrs.model.Encounter;
+import com.asgard.consumer.mrs.model.Order;
+import com.asgard.consumer.mrs.model.Person;
 import com.asgard.consumer.mrs.model.PersonName;
+import com.asgard.consumer.mrs.service.ConceptService;
 import com.asgard.consumer.mrs.service.DrugService;
+import com.asgard.consumer.mrs.service.EncounterService;
 import com.asgard.consumer.mrs.service.IdentifierService;
+import com.asgard.consumer.mrs.service.OrderService;
 import com.asgard.consumer.mrs.service.PersonService;
 import com.asgard.consumer.mrs.service.realPersonService;
 import com.asgard.consumer.odoo.model.DrugProduct;
 import com.asgard.consumer.odoo.model.DrugTemplate;
 import com.asgard.consumer.odoo.model.ResPartner;
+import com.asgard.consumer.odoo.model.SaleOrder;
+import com.asgard.consumer.odoo.model.SaleOrderLine;
 import com.asgard.consumer.odoo.service.DrugProductService;
 import com.asgard.consumer.odoo.service.DrugTemplateService;
 import com.asgard.consumer.odoo.service.OdooService;
+import com.asgard.consumer.odoo.service.SaleOrderService;
+import com.asgard.consumer.odoo.service.SalesOrderLineService;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode.Exclude;
 
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -36,10 +48,22 @@ public final IdentifierService identifierService;
 public final DrugService drugService;
 public final DrugTemplateService drugTemplateService;
 public final DrugProductService drugProductService;
+public final EncounterService encounterService;
+public final SaleOrderService saleOrderService;
+public final OrderService orderService;
+public final SalesOrderLineService salesOrderLineService;
+public final ConceptService conceptService;
+//private int counter = 0;
+
+
+
 List<User> orderslist = new ArrayList<>();
 
 	@KafkaListener(groupId = "odin23", topics = "asgard.openmrs.event_records", containerFactory = "userKafkaListenerContainerFactory")
 	public List<User> orders(User event) {
+		System.out.println("i am hererrerere");
+		System.out.println(event);
+
 
 	//If event is drug 
 	if("drug".equals(event.getCategory())){
@@ -93,7 +117,129 @@ List<User> orderslist = new ArrayList<>();
 	}
 
 	//if event is encounter
-	else if("encounter".equals(event.getCategory())){
+	else if("Encounter".equals(event.getCategory())){
+		//get encouter uuid
+		String uuString = event.getObject().substring(28+19,19+28+36);
+		System.out.println(uuString);
+		Encounter encountered = encounterService.Findbyuuid(uuString).get(0);
+		System.out.println(encountered);
+		Person patient = realpersonService.findbyid(encountered.getPatientId()).get(0);
+		List<ResPartner> checklist = odooService.findByuuid(patient.getUuid());
+		System.out.println("could not "+checklist.size());
+
+		if(checklist.isEmpty()){
+			System.out.println("could not find encountered patient");
+		}
+		else{
+			System.out.println("could not "+checklist.size());
+
+			ResPartner customer  = checklist.get(0);
+			System.out.println("herrrr"+customer);
+
+			List<SaleOrder> pendingorders = saleOrderService.findBypid(customer.getId());
+			if(pendingorders.isEmpty()){
+
+				//Making a new order name system, original order system is SOXX to be reworked later
+					String Ordername = "LM";
+					Integer customerid = customer.getId();
+	
+					//provider names and id are nullable 
+					String providername = "Asgardian";
+					Integer providerid= null;
+					String provieruuid= null;
+	
+					
+					String caresetting = "Hospital";
+	
+	
+	
+					SaleOrder neworder = new SaleOrder(
+						customerid,
+						Ordername,
+						providerid,
+						providername,
+						caresetting,
+						null
+					);
+					neworder = saleOrderService.insertInto(neworder);
+					List<Order> orderList = orderService.findorders(patient.getPersonId());
+					if(orderList.isEmpty()){
+						System.out.println("No orders detected");
+	
+					}else{
+						System.out.println("orrrrrderrrr"+orderList.size());
+						
+	
+						for(int i = 0 ;i <orderList.size();i++){
+	
+							Integer saleorderid = neworder.getId();
+							List<Concept> concept = conceptService.Findbyid(orderList.get(i).getConceptId());
+							String concepString = concept.get(0).getUuid();
+							DrugProduct tempproduct = drugProductService.findByuuid(concepString).get(0);
+							Integer productid = tempproduct.getId();
+							//Integer orderid = neworder.getId();
+							DrugTemplate tempdrug = drugTemplateService.findByid(productid).get(0);
+							String name  =tempdrug.getName();
+							SaleOrderLine newsalesorderline = new SaleOrderLine(
+								customerid,
+								saleorderid,
+								productid,
+								name
+							);
+							salesOrderLineService.InsertInto(newsalesorderline);
+		
+						}
+					}
+	
+	
+				}
+				else{
+					List<Order> orderList = orderService.findorders(patient.getPersonId());
+					Integer customerid = customer.getId();
+
+					if(orderList.isEmpty()){
+						System.out.println("No orders detected");
+	
+					}else{
+						System.out.println("not found"+orderList.size());
+
+						SaleOrder neworder =pendingorders.get(0);
+	
+	
+						for(int i = 0 ;i <orderList.size();i++){
+	
+							Integer saleorderid = neworder.getId();
+							List<Concept> concept = conceptService.Findbyid(orderList.get(i).getConceptId());
+							String concepString = concept.get(0).getUuid();
+							DrugProduct tempproduct = drugProductService.findByuuid(concepString).get(0);
+							Integer productid = tempproduct.getId();
+							//Integer orderid = neworder.getId();
+							DrugTemplate tempdrug = drugTemplateService.findByid(productid).get(0);
+							String name  =tempdrug.getName();
+							SaleOrderLine newsalesorderline = new SaleOrderLine(
+								customerid,
+								saleorderid,
+								productid,
+								name
+							);
+							salesOrderLineService.InsertInto(newsalesorderline);
+		
+						}
+					}
+
+
+	
+				}
+
+
+		}
+
+
+
+
+
+
+
 
 	}
 	return orderslist;
