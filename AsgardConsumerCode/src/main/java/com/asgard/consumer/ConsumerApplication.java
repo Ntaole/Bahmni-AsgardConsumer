@@ -121,12 +121,14 @@ List<User> orderslist = new ArrayList<>();
 		//get encouter uuid
 		String uuString = event.getObject().substring(28+19,19+28+36);
 		System.out.println(uuString);
+		//get encouter infromation in openmrs
 		Encounter encountered = encounterService.Findbyuuid(uuString).get(0);
 		System.out.println(encountered);
+		//identify patient as customer in odoo
 		Person patient = realpersonService.findbyid(encountered.getPatientId()).get(0);
 		List<ResPartner> checklist = odooService.findByuuid(patient.getUuid());
 		System.out.println("could not "+checklist.size());
-
+		//return error if patient not found...poor exeption handling needs update in future versions
 		if(checklist.isEmpty()){
 			System.out.println("could not find encountered patient");
 		}
@@ -143,7 +145,7 @@ List<User> orderslist = new ArrayList<>();
 					String Ordername = "LM";
 					Integer customerid = customer.getId();
 	
-					//provider names and id are nullable 
+					//provider names and id are nullable but needs to be reworked in later versions
 					String providername = "Asgardian";
 					Integer providerid= null;
 					String provieruuid= null;
@@ -152,7 +154,7 @@ List<User> orderslist = new ArrayList<>();
 					String caresetting = "Hospital";
 	
 	
-	
+					//minimal constructor for inserts
 					SaleOrder neworder = new SaleOrder(
 						customerid,
 						Ordername,
@@ -161,15 +163,16 @@ List<User> orderslist = new ArrayList<>();
 						caresetting,
 						null
 					);
+
+					//create new order if no order existed before with constructed information
 					neworder = saleOrderService.insertInto(neworder);
 					List<Order> orderList = orderService.findorders(patient.getPersonId());
 					if(orderList.isEmpty()){
-						System.out.println("No orders detected");
+//						System.out.println("No orders detected");
 	
 					}else{
-						System.out.println("orrrrrderrrr"+orderList.size());
+//						System.out.println("orrrrrderrrr"+orderList.size());
 						
-	
 						for(int i = 0 ;i <orderList.size();i++){
 	
 							Integer saleorderid = neworder.getId();
@@ -233,19 +236,10 @@ List<User> orderslist = new ArrayList<>();
 
 
 		}
-
-
-
-
-
-
-
-
 	}
 	return orderslist;
 
 }
-
 
 	public static void main(String[] args) {
 		SpringApplication.run(ConsumerApplication.class, args);
