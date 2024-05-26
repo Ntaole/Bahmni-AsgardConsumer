@@ -20,7 +20,7 @@ The system can currently synchronize Bahmni ERM and Odoo patients and drugs.Proo
 
 1. Copy the contents of **binlogconfig.txt** file.
 2. Paste the contents into the running **openmrsdb** container in the file **/etc/mysql/mysql.cnf** and save.
-3. Restart the **openmrsdb** container.
+3. Restart the openmrs db container.
 
 ### 4. **Grant Debezium User in OpenMRSDB**
 
@@ -34,9 +34,9 @@ The system can currently synchronize Bahmni ERM and Odoo patients and drugs.Proo
 
 1. Stop and restart the consumer container.
 
-### 7. **Stop OdooConnect Container**
+### 7. **Stop Odoo Connect Container**
 
-1. Stop the **odooconnect** container.
+1. Stop the **odoo connect** container.
 
 ## Contributing
 
